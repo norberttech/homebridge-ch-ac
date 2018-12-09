@@ -1,4 +1,4 @@
-# Control Gree and partners Air Conditioning with homekit
+# Cooper&Hunter AC plugin for Homebridge 
 
 This plugins is based on https://github.com/ddenisyuk/homebridge-gree-heatercooler.
 
