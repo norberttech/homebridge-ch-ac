@@ -1,6 +1,6 @@
 {
   "name": "homebridge-ch-ac",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Cooper&Hunter AC plugin for Homebridge (Homekit).",
   "license": "MIT",
   "keywords": [
