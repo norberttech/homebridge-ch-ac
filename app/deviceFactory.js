@@ -28,9 +28,6 @@ class Device {
             port: 8000 + parseInt(options.host.split('.')[3]),
         };
 
-        console.log("[GreeAC]: init deviceFactory on host %s [server port %s]", this.options.host, this.options.port);
-        console.log(this.options);
-
         this.device = {};
 
         // Initialize connection and bind with device
@@ -50,11 +47,9 @@ class Device {
             this.socket.bind(port, "0.0.0.0", () => {
                 const message = new Buffer(JSON.stringify({t: 'scan'}));
                 this.socket.setBroadcast(false);
-                console.log("[GreeAC]: connecting to %s [using source port %d]", address, port);
                 this.socket.send(message, 0, message.length, 7000, address);
             });
         } catch (err) {
-            console.log("[GreeAC]: _connectToDevice error - port %d %s", port, err);
             const timeout = 5;
             this.options.onDisconnected(this.device);
             setTimeout(() => {
@@ -77,7 +72,6 @@ class Device {
         this.device.port = port;
         this.device.bound = false;
         this.device.props = {};
-        console.log('[GreeAC] New device added: %s - %s', this.device.name, this.device.address);
     }
 
     /**
@@ -110,7 +104,6 @@ class Device {
     _confirmBinding(id, key) {
         this.device.bound = true;
         this.device.key = key;
-        console.log('[GreeAC] device is bound: %s - %s', this.device.name, this.device.key);
     }
 
     /**
@@ -118,7 +111,6 @@ class Device {
      * @param {Device} device - Device
      */
     _requestDeviceStatus(device) {
-        var that = this;
         const message = {
             cols: Object.keys(cmd).map(key => cmd[key].code),
             mac: device.id,
@@ -136,7 +128,6 @@ class Device {
      */
     _handleResponse(msg, rinfo) {
         if (rinfo.address != this.options.host) {
-            //console.log("We received response from %s but we are looking for %s",rinfo.address, this.options.host );
             return;
         }
         const message = JSON.parse(msg + '');
@@ -147,6 +138,7 @@ class Device {
             if (pack.t === 'dev') {
                 this._setDevice(message.cid, pack.name, rinfo.address, rinfo.port);
                 this._sendBindRequest(this.device);
+
                 return;
             }
 
@@ -156,7 +148,8 @@ class Device {
 
                 // Start requesting device status on set interval
                 setInterval(this._requestDeviceStatus.bind(this, this.device), this.options.updateInterval);
-                this.options.onConnected(this.device)
+                this.options.onConnected(this.device);
+
                 return;
             }
 
@@ -166,6 +159,7 @@ class Device {
                     this.device.props[col] = pack.dat[i];
                 });
                 this.options.onStatus(this.device);
+
                 return;
             }
 

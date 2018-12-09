@@ -5,7 +5,7 @@ This plugins is based on https://github.com/ddenisyuk/homebridge-gree-heatercool
 Should work with all Cooper&Hunter AC controlled by EWPE Smart APP. 
 
 ## Requirements 
-- NodeJS (>=8.9.3) with NPM
+- NodeJS (>=8.9.3) with NPM (>=6.4.1)
 
 For each AC device you need to add an accessory and specify the IP address of the device.
 

@@ -3,7 +3,6 @@ const deviceFactory = require('./app/deviceFactory');
 let Service, Characteristic;
 
 module.exports = function (homebridge) {
-    console.log(homebridge.platformAccessory);
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
     homebridge.registerAccessory('homebridge-ch-ac', 'CooperHunterAC', CooperHunterAC);
@@ -17,6 +16,7 @@ function CooperHunterAC(log, config) {
     this.updateInterval = config.updateInterval || 10000;
     this.tempSensorShift = config.tempSensorShift || 40;
     this.model = config.model || "Cooper&Hunter AC";
+    this.log.log(config);
 }
 
 CooperHunterAC.prototype = {
