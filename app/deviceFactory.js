@@ -56,6 +56,7 @@ class Device {
                 const message = new Buffer(JSON.stringify({t: 'scan'}));
                 this.socket.setBroadcast(false);
                 this.socket.send(message, 0, message.length, 7000, address);
+                this.log.info('Sent scan message to identify devices');
             });
         } catch (err) {
             const timeout = 5;
@@ -138,7 +139,9 @@ class Device {
      * @param {number} rinfo.port Port number
      */
     _handleResponse(msg, rinfo) {
-        if (rinfo.address != this.options.host) {
+        if (rinfo.address !== this.options.host) {
+            this.log.info('Received response from unexpected address %s', rinfo.address);
+
             return;
         }
         const message = JSON.parse(msg + '');
