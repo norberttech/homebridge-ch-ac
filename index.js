@@ -6,158 +6,160 @@ module.exports = function (homebridge) {
     console.log(homebridge.platformAccessory);
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
-    homebridge.registerAccessory('homebridge-gree-heatercooler', 'GreeHeaterCooler', GreeHeaterCooler);
-}
+    homebridge.registerAccessory('homebridge-ch-ac', 'CooperHunterAC', CooperHunterAC);
+};
 
-function GreeHeaterCooler(log, config) {
+function CooperHunterAC(log, config) {
     this.log = log;
     this.name = config.name;
     this.host = config.host;
+    this.serial = config.serial;
     this.updateInterval = config.updateInterval || 10000;
-    this.acTempSensorShift = config.acTempSensorShift || 40;
-    this.model = config.acModel || "Gree HeaterCooler";
+    this.tempSensorShift = config.tempSensorShift || 40;
+    this.model = config.model || "Cooper&Hunter AC";
 
-    this.services = [];
-
-    this.GreeACService = new Service.HeaterCooler(this.name);
-
-    this.GreeACService
-        .getCharacteristic(Characteristic.Active)
-        .on('get', this.getActive.bind(this))
-        .on('set', this.setActive.bind(this));
-
-    this.GreeACService
-        .getCharacteristic(Characteristic.CurrentHeaterCoolerState)
-        .on('get', this.getCurrentHeaterCoolerState.bind(this));
-
-    this.GreeACService
-        .getCharacteristic(Characteristic.TargetHeaterCoolerState)
-        .on('set', this.setTargetHeaterCoolerState.bind(this))
-        .on('get', this.getTargetHeaterCoolerState.bind(this));
-
-    this.GreeACService
-        .getCharacteristic(Characteristic.CurrentTemperature)
-        .setProps({
-            minValue: -100,
-            maxValue: 100,
-            minStep: 0.01
-        })
-        .on('get', this.getCurrentTemperature.bind(this));
-
-    this.GreeACService
-        .getCharacteristic(Characteristic.TemperatureDisplayUnits)
-        .on('get', this.getTemperatureDisplayUnits.bind(this))
-        .on('set', this.setTemperatureDisplayUnits.bind(this));
-
-    this.GreeACService.getCharacteristic(Characteristic.CoolingThresholdTemperature)
-        .setProps({
-            minValue: 18,
-            maxValue: 30,
-            minStep: 1
-        })
-        .on('set', this.setTargetTemperature.bind(this))
-        .on('get', this.getTargetTemperature.bind(this));
-
-    this.GreeACService.getCharacteristic(Characteristic.HeatingThresholdTemperature)
-        .setProps({
-            minValue: 18,
-            maxValue: 30,
-            minStep: 1
-        })
-        .on('set', this.setTargetTemperature.bind(this))
-        .on('get', this.getTargetTemperature.bind(this));
-
-    this.GreeACService
-        .getCharacteristic(Characteristic.SwingMode)
-        .on('get', this.getSwingMode.bind(this))
-        .on('set', this.setSwingMode.bind(this));
-
-    this.GreeACService
-        .getCharacteristic(Characteristic.RotationSpeed)
-        .setProps({
-            unit: null,
-            format: Characteristic.Formats.UINT8,
-            maxValue: 6,
-            minValue: 1,
-            validValues: [1, 2, 3, 4, 5, 6] // 6 - auto
-        })
-        .on('get', this.getRotationSpeed.bind(this))
-        .on('set', this.setRotationSpeed.bind(this));
-
-
-    this.services.push(this.GreeACService);
-
-    this.serviceInfo = new Service.AccessoryInformation();
-
-    this.serviceInfo
-        .setCharacteristic(Characteristic.Name, this.name)
-        .setCharacteristic(Characteristic.Manufacturer, 'Gree')
-        .setCharacteristic(Characteristic.Model, this.model)
-        .setCharacteristic(Characteristic.SerialNumber, this.host.replace(/./g, ""));
-
-    this.services.push(this.serviceInfo);
-
-    this.discover();
+    log.log(config);
 }
 
-GreeHeaterCooler.prototype = {
+CooperHunterAC.prototype = {
 
     getServices: function () {
-        return this.services;
+        let heaterCoolerService = new Service.HeaterCooler(this.name);
+
+        heaterCoolerService
+            .getCharacteristic(Characteristic.Active)
+            .on('get', this.getActive.bind(this))
+            .on('set', this.setActive.bind(this));
+
+        heaterCoolerService
+            .getCharacteristic(Characteristic.CurrentHeaterCoolerState)
+            .on('get', this.getCurrentHeaterCoolerState.bind(this));
+
+        heaterCoolerService
+            .getCharacteristic(Characteristic.TargetHeaterCoolerState)
+            .on('set', this.setTargetHeaterCoolerState.bind(this))
+            .on('get', this.getTargetHeaterCoolerState.bind(this));
+
+        heaterCoolerService
+            .getCharacteristic(Characteristic.CurrentTemperature)
+            .setProps({
+                minValue: -100,
+                maxValue: 100,
+                minStep: 0.01
+            })
+            .on('get', this.getCurrentTemperature.bind(this));
+
+        heaterCoolerService
+            .getCharacteristic(Characteristic.TemperatureDisplayUnits)
+            .on('get', this.getTemperatureDisplayUnits.bind(this))
+            .on('set', this.setTemperatureDisplayUnits.bind(this));
+
+        heaterCoolerService.getCharacteristic(Characteristic.CoolingThresholdTemperature)
+            .setProps({
+                minValue: 16,
+                maxValue: 30,
+                minStep: 1
+            })
+            .on('set', this.setTargetTemperature.bind(this))
+            .on('get', this.getTargetTemperature.bind(this));
+
+        heaterCoolerService.getCharacteristic(Characteristic.HeatingThresholdTemperature)
+            .setProps({
+                minValue: 16,
+                maxValue: 30,
+                minStep: 1
+            })
+            .on('set', this.setTargetTemperature.bind(this))
+            .on('get', this.getTargetTemperature.bind(this));
+
+        heaterCoolerService
+            .getCharacteristic(Characteristic.SwingMode)
+            .on('get', this.getSwingMode.bind(this))
+            .on('set', this.setSwingMode.bind(this));
+
+        heaterCoolerService
+            .getCharacteristic(Characteristic.RotationSpeed)
+            .setProps({
+                unit: null,
+                format: Characteristic.Formats.UINT8,
+                maxValue: 6,
+                minValue: 1,
+                validValues: [1, 2, 3, 4, 5, 6] // 6 - auto
+            })
+            .on('get', this.getRotationSpeed.bind(this))
+            .on('set', this.setRotationSpeed.bind(this));
+
+
+        let serviceInfo = new Service.AccessoryInformation();
+
+        serviceInfo
+            .setCharacteristic(Characteristic.Name, this.name)
+            .setCharacteristic(Characteristic.Manufacturer, 'Cooper&Hunter')
+            .setCharacteristic(Characteristic.Model, this.model)
+            .setCharacteristic(Characteristic.SerialNumber, this.serial);
+
+        this.discover(heaterCoolerService);
+
+        return [serviceInfo, heaterCoolerService];
     },
 
-    discover: function () {
+    identify: function (callback) {
 
-        let me = this,
-            log = this.log;
+        this.device.setTemp(22);
+        this.log.info("identify: set temperature to 22");
+
+        callback();
+    },
+
+    discover: function (heaterCoolerService) {
 
         const deviceOptions = {
-            host: me.host,
-            updateInterval: me.updateInterval,
+            host: this.host,
+            updateInterval: this.updateInterval,
             onStatus: (deviceModel) => {
-                me.getActive((x, val) => {
-                    me.GreeACService
+                this.getActive((x, val) => {
+                   heaterCoolerService
                         .getCharacteristic(Characteristic.Active)
                         .updateValue(val);
                 });
 
-                me.getTargetHeaterCoolerState((x, val) => {
-                    me.GreeACService
+                this.getTargetHeaterCoolerState((x, val) => {
+                    heaterCoolerService
                         .getCharacteristic(Characteristic.TargetHeaterCoolerState)
                         .updateValue(val);
                 });
 
-                me.getCurrentHeaterCoolerState((x, val) => {
-                    me.GreeACService
+                this.getCurrentHeaterCoolerState((x, val) => {
+                    heaterCoolerService
                         .getCharacteristic(Characteristic.CurrentHeaterCoolerState)
                         .updateValue(val);
                 });
 
-                me.getCurrentTemperature((x, val) => {
-                    me.GreeACService
+                this.getCurrentTemperature((x, val) => {
+                    heaterCoolerService
                         .getCharacteristic(Characteristic.CurrentTemperature)
                         .updateValue(val);
                 });
 
 
-                me.getTargetTemperature((x, val) => {
-                    me.GreeACService
+                this.getTargetTemperature((x, val) => {
+                    heaterCoolerService
                         .getCharacteristic(Characteristic.CoolingThresholdTemperature)
                         .updateValue(val);
-                    me.GreeACService
+                    heaterCoolerService
                         .getCharacteristic(Characteristic.HeatingThresholdTemperature)
                         .updateValue(val);
                 });
 
 
-                me.getSwingMode((x, val) => {
-                    me.GreeACService
+                this.getSwingMode((x, val) => {
+                    heaterCoolerService
                         .getCharacteristic(Characteristic.SwingMode)
                         .updateValue(val);
                 });
 
-                me.getRotationSpeed((x, val) => {
-                    me.GreeACService
+                this.getRotationSpeed((x, val) => {
+                    heaterCoolerService
                         .getCharacteristic(Characteristic.RotationSpeed)
                         .updateValue(val);
                 });
@@ -184,7 +186,7 @@ GreeHeaterCooler.prototype = {
             }
         };
         log.info("Start discover device %s", deviceOptions.host);
-        me.device = deviceFactory.connect(deviceOptions);
+        this.device = deviceFactory.connect(deviceOptions);
     },
 
     setActive: function (Active, callback, context) {
@@ -222,7 +224,7 @@ GreeHeaterCooler.prototype = {
 
     },
     getCurrentTemperature: function (callback) {
-        callback(null, this.device.getRoomTemp() - this.acTempSensorShift);
+        callback(null, this.device.getRoomTemp() - this.tempSensorShift);
     },
     setTemperatureDisplayUnits: function (value, callback) {
         // F is unsupported
@@ -311,17 +313,6 @@ GreeHeaterCooler.prototype = {
         callback();
     },
 
-    identify: function (callback) {
-
-        this.device.setTemp(22);
-        this.log.info("identify: set temperature to 22");
-
-        callback();
-    },
-
-    getServices: function () {
-        return this.services;
-    },
     _isContextValid: function (context) {
         return context !== 'fromSetValue';
     }

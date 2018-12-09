@@ -1,17 +1,13 @@
 # Control Gree and partners Air Conditioning with homekit
 
-This plugins is based on https://github.com/duculete/homebridge-gree-ac.
-Diff:
-- uses HeaterCooler instead Thermostat;
-- no need external temperature sensor and mqtt.
+This plugins is based on https://github.com/ddenisyuk/homebridge-gree-heatercooler.
 
-Should work with all Gree and partners (EWPE Smart APP) AC. 
+Should work with all Cooper&Hunter AC controlled by EWPE Smart APP. 
 
 ## Requirements 
 - NodeJS (>=8.9.3) with NPM
 
 For each AC device you need to add an accessory and specify the IP address of the device.
-
 
 ## Usage Example:
 ```
@@ -24,19 +20,21 @@ For each AC device you need to add an accessory and specify the IP address of th
     },
     "accessories": [
         {
-            "accessory": "GreeHeaterCooler",
+            "accessory": "CooperHunterAC",
             "host": "192.168.1.X",
-            "name": "Living room AC",
-            "acModel": "Gree V2",
-            "acTempSensorShift": 40,
+            "name": "Bedroom AC",
+            "serial": "ch-00-00-01",
+            "model": "CH-S09FTXE WIFI",
+            "tempSensorShift": 40,
             "updateInterval": 10000
         },
         {
-            "accessory": "GreeHeaterCooler",
+            "accessory": "CooperHunterAC",
             "host": "192.168.1.Y",
-            "name": "Bedroom AC",
-            "acModel": "C&H",
-            "acTempSensorShift": 40,
+            "name": "Living room AC",
+            "serial": "ch-00-00-02",
+            "model": "CH-S09FTXE WIFI",
+            "tempSensorShift": 40,
             "updateInterval": 10000
         }
     ]

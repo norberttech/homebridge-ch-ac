@@ -7,19 +7,21 @@
     },
     "accessories": [
         {
-            "accessory": "GreeHeaterCooler",
+            "accessory": "CooperHunterAC",
             "host": "192.168.1.X",
-            "name": "Living room AC",
-            "acModel": "Gree V2",
-            "acTempSensorShift": 40,
+            "name": "Bedroom AC",
+            "serial": "ch-00-00-01",
+            "model": "CH-S09FTXE WIFI",
+            "tempSensorShift": 40,
             "updateInterval": 10000
         },
         {
-            "accessory": "GreeHeaterCooler",
+            "accessory": "CooperHunterAC",
             "host": "192.168.1.Y",
-            "name": "Bedroom AC",
-            "acModel": "C&H",
-            "acTempSensorShift": 40,
+            "name": "Living room AC",
+            "serial": "ch-00-00-02",
+            "model": "CH-S09FTXE WIFI",
+            "tempSensorShift": 40,
             "updateInterval": 10000
         }
     ]

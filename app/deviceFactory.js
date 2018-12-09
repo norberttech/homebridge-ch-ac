@@ -26,37 +26,26 @@ class Device {
             onDisconnected: options.onDisconnected || function() {},
             updateInterval: options.updateInterval || 10000,
             port: 8000 + parseInt(options.host.split('.')[3]),
-        }
+        };
 
-        /**
-         * Device object
-         * @typedef {object} Device
-         * @property {string} id - ID
-         * @property {string} name - Name
-         * @property {string} address - IP address
-         * @property {number} port - Port number
-         * @property {boolean} bound - If is already bound
-         * @property {object} props - Properties
-         */
-        var that = this;
+        console.log("[GreeAC]: init deviceFactory on host %s [server port %s]", this.options.host, this.options.port);
+        console.log(this.options);
 
-        console.log("[GreeAC]: init deviceFactory on host %s [server port %s]", that.options.host, that.options.port);
-
-        that.device = {};
+        this.device = {};
 
         // Initialize connection and bind with device
-        that._connectToDevice(that.options.host, that.options.port);
+        this._connectToDevice(this.options.host, this.options.port);
 
         // Handle incoming messages
-        this.socket.on('message', (msg, rinfo) => that._handleResponse(msg, rinfo));
+        this.socket.on('message', (msg, rinfo) => this._handleResponse(msg, rinfo));
     }
 
     /**
      * Initialize connection
      * @param {string} address - IP/host address
+     * @param {int} port
      */
     _connectToDevice(address, port) {
-        var that = this;
         try {
             this.socket.bind(port, "0.0.0.0", () => {
                 const message = new Buffer(JSON.stringify({t: 'scan'}));
@@ -66,10 +55,10 @@ class Device {
             });
         } catch (err) {
             console.log("[GreeAC]: _connectToDevice error - port %d %s", port, err);
-            const timeout = 5
-            that.options.onDisconnected(that.device);
+            const timeout = 5;
+            this.options.onDisconnected(this.device);
             setTimeout(() => {
-                that._connectToDevice(address, port);
+                this._connectToDevice(address, port);
             }, timeout * 1000);
         }
     }
@@ -82,14 +71,13 @@ class Device {
      * @param {number} port - Port number
      */
     _setDevice(id, name, address, port) {
-        var that = this;
-        that.device.id = id;
-        that.device.name = name;
-        that.device.address = address;
-        that.device.port = port;
-        that.device.bound = false;
-        that.device.props = {};
-        console.log('[GreeAC] New device added: %s - %s', that.device.name, that.device.address);
+        this.device.id = id;
+        this.device.name = name;
+        this.device.address = address;
+        this.device.port = port;
+        this.device.bound = false;
+        this.device.props = {};
+        console.log('[GreeAC] New device added: %s - %s', this.device.name, this.device.address);
     }
 
     /**
@@ -97,9 +85,8 @@ class Device {
      * @param {Device} device Device object
      */
     _sendBindRequest(device) {
-        var that = this;
         const message = {
-            mac: that.device.id,
+            mac: this.device.id,
             t: 'bind',
             uid: 0
         };
@@ -121,10 +108,9 @@ class Device {
      * @param {String} key - Encryption key
      */
     _confirmBinding(id, key) {
-        var that = this;
-        that.device.bound = true;
-        that.device.key = key;
-        console.log('[GreeAC] device is bound: %s - %s', that.device.name, that.device.key);
+        this.device.bound = true;
+        this.device.key = key;
+        console.log('[GreeAC] device is bound: %s - %s', this.device.name, this.device.key);
     }
 
     /**
@@ -138,7 +124,7 @@ class Device {
             mac: device.id,
             t: 'status'
         };
-        that._sendRequest(message, device.address, device.port);
+        this._sendRequest(message, device.address, device.port);
     }
 
     /**
@@ -149,52 +135,51 @@ class Device {
      * @param {number} rinfo.port Port number
      */
     _handleResponse(msg, rinfo) {
-        var that = this;
-        if (rinfo.address != that.options.host) {
-            //console.log("We received response from %s but we are looking for %s",rinfo.address, that.options.host );
+        if (rinfo.address != this.options.host) {
+            //console.log("We received response from %s but we are looking for %s",rinfo.address, this.options.host );
             return;
         }
         const message = JSON.parse(msg + '');
         try {
             // Extract encrypted package from message using device key (if available)
-            const pack = encryptionService.decrypt(message, (that.device || {}).key);
+            const pack = encryptionService.decrypt(message, (this.device || {}).key);
             // If package type is response to handshake
             if (pack.t === 'dev') {
-                that._setDevice(message.cid, pack.name, rinfo.address, rinfo.port);
-                that._sendBindRequest(that.device);
+                this._setDevice(message.cid, pack.name, rinfo.address, rinfo.port);
+                this._sendBindRequest(this.device);
                 return;
             }
 
             // If package type is binding confirmation
-            if (pack.t === 'bindok' && that.device.id) {
-                that._confirmBinding(message.cid, pack.key);
+            if (pack.t === 'bindok' && this.device.id) {
+                this._confirmBinding(message.cid, pack.key);
 
                 // Start requesting device status on set interval
-                setInterval(that._requestDeviceStatus.bind(this, that.device), that.options.updateInterval);
-                that.options.onConnected(that.device)
+                setInterval(this._requestDeviceStatus.bind(this, this.device), this.options.updateInterval);
+                this.options.onConnected(this.device)
                 return;
             }
 
             // If package type is device status
-            if (pack.t === 'dat' && that.device.bound) {
+            if (pack.t === 'dat' && this.device.bound) {
                 pack.cols.forEach((col, i) => {
-                    that.device.props[col] = pack.dat[i];
+                    this.device.props[col] = pack.dat[i];
                 });
-                that.options.onStatus(that.device);
+                this.options.onStatus(this.device);
                 return;
             }
 
             // If package type is response, update device properties
-            if (pack.t === 'res' && that.device.bound) {
+            if (pack.t === 'res' && this.device.bound) {
                 pack.opt.forEach((opt, i) => {
-                    that.device.props[opt] = pack.val[i];
+                    this.device.props[opt] = pack.val[i];
                 });
-                that.options.onUpdate(that.device);
+                this.options.onUpdate(this.device);
                 return;
             }
-            that.options.onError(that.device);
+            this.options.onError(this.device);
         } catch (err) {
-            that.options.onError(that.device);
+            this.options.onError(this.device);
         }
     }
 
@@ -204,13 +189,12 @@ class Device {
      * @param {number[]} values List of values
      */
     _sendCommand(commands = [], values = []) {
-        var that = this;
         const message = {
             opt: commands,
             p: values,
             t: 'cmd'
         };
-        that._sendRequest(message);
+        this._sendRequest(message);
     };
 
     /**
@@ -240,8 +224,7 @@ class Device {
      * @param {boolean} value State
      */
     setPower(value) {
-        var that = this;
-        that._sendCommand(
+        this._sendCommand(
             [cmd.power.code],
             [value ? 1 : 0]
         );
@@ -257,8 +240,7 @@ class Device {
      * @param {number} [unit=0] Units (defaults to Celsius)
      */
     setTemp(value, unit = cmd.temperatureUnit.value.celsius) {
-        var that = this;
-        that._sendCommand(
+        this._sendCommand(
             [cmd.temperatureUnit.code, cmd.temperature.code],
             [unit, value]
         );
@@ -273,8 +255,7 @@ class Device {
      * @param {number} value Mode value (0-4)
      */
     setMode(value) {
-        var that = this;
-        that._sendCommand(
+        this._sendCommand(
             [cmd.mode.code],
             [value]
         );
@@ -289,8 +270,7 @@ class Device {
      * @param {number} value Fan speed value (0-5)
      */
     setFanSpeed(value) {
-        var that = this;
-        that._sendCommand(
+        this._sendCommand(
             [cmd.fanSpeed.code],
             [value]
         );
@@ -305,8 +285,7 @@ class Device {
      * @param {number} value Vertical swing value (0-11)
      */
     setSwingVert(value) {
-        var that = this;
-        that._sendCommand(
+        this._sendCommand(
             [cmd.swingVert.code],
             [value]
         );
