@@ -101,6 +101,7 @@ CooperHunterAC.prototype = {
     },
 
     identify: function (callback) {
+        this.device.setPower(false);
         callback();
     },
 
@@ -182,7 +183,7 @@ CooperHunterAC.prototype = {
             }
         };
         this.log.info("Start discover device %s", deviceOptions.host);
-        this.device = deviceFactory.connect(deviceOptions);
+        this.device = deviceFactory.connect(deviceOptions, this.log);
     },
 
     setActive: function (Active, callback, context) {

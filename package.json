@@ -1,6 +1,6 @@
 {
   "name": "homebridge-ch-ac",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Cooper&Hunter AC plugin for Homebridge (Homekit).",
   "license": "MIT",
   "keywords": [
@@ -12,10 +12,6 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/norzechowicz/homebridge-ch-ac.git"
-  },
-  "engines": {
-    "node": ">=0.12.0",
-    "homebridge": ">=0.2.0"
   },
   "main": "index.js"
 }

@@ -14,8 +14,9 @@ class Device {
      * @callback [options.onUpdate] Callback function run after command
      * @callback [options.onConnected] Callback function run once connection is established
      */
-    constructor(options) {
+    constructor(options, log) {
         this.socket = dgram.createSocket({type: 'udp4', reuseAddr: true});
+        this.log = log;
         //  Set defaults
         this.options = {
             host: options.host,
@@ -27,6 +28,10 @@ class Device {
             updateInterval: options.updateInterval || 10000,
             port: 8000 + parseInt(options.host.split('.')[3]),
         };
+
+        this.log.info('Connecting new C&H AC device');
+        this.log.info("host: %s", this.options.host);
+        this.log.info("port: %s", this.options.port);
 
         this.device = {
             bound : false,
@@ -75,6 +80,7 @@ class Device {
         this.device.port = port;
         this.device.bound = false;
         this.device.props = {};
+        this.log('Device identified %s, %s, %s, %s', id, name, address, port);
     }
 
     /**
@@ -97,6 +103,7 @@ class Device {
         };
         const toSend = new Buffer(JSON.stringify(request));
         this.socket.send(toSend, 0, toSend.length, device.port, device.address);
+        this.log('Sent bind request');
     }
 
     /**
@@ -107,6 +114,7 @@ class Device {
     _confirmBinding(id, key) {
         this.device.bound = true;
         this.device.key = key;
+        this.log('Binding confirmed');
     }
 
     /**
@@ -151,6 +159,7 @@ class Device {
 
                 // Start requesting device status on set interval
                 setInterval(this._requestDeviceStatus.bind(this, this.device), this.options.updateInterval);
+                this.log('Sent first device status request');
                 this.options.onConnected(this.device);
 
                 return;
@@ -297,7 +306,7 @@ class Device {
     };
 }
 
-module.exports.connect = function (options) {
-    return new Device(options);
+module.exports.connect = function (options, log) {
+    return new Device(options, log);
 };
 
