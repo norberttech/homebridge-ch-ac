@@ -41,3 +41,7 @@ For each AC device you need to add an accessory and specify the IP address of th
 }
 ```
 
+## C&H AC communication protocol 
+
+Communication protocol for C&H AC is the same as for [GreeSmart](https://play.google.com/store/apps/details?id=com.gree.smarthome). 
+It is described in open source project [Gree Remote](https://github.com/tomikaa87/gree-remote#protocol-details). 

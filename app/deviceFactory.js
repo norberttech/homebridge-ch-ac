@@ -28,7 +28,10 @@ class Device {
             port: 8000 + parseInt(options.host.split('.')[3]),
         };
 
-        this.device = {};
+        this.device = {
+            bound : false,
+            props : {}
+        };
 
         // Initialize connection and bind with device
         this._connectToDevice(this.options.host, this.options.port);
@@ -292,7 +295,7 @@ class Device {
     getRoomTemp() {
         return this.device.props[cmd.TemSen.code];
     };
-};
+}
 
 module.exports.connect = function (options) {
     return new Device(options);

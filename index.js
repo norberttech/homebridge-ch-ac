@@ -16,7 +16,6 @@ function CooperHunterAC(log, config) {
     this.updateInterval = config.updateInterval || 10000;
     this.tempSensorShift = config.tempSensorShift || 40;
     this.model = config.model || "Cooper&Hunter AC";
-    this.log.log(config);
 }
 
 CooperHunterAC.prototype = {
@@ -102,10 +101,6 @@ CooperHunterAC.prototype = {
     },
 
     identify: function (callback) {
-
-        this.device.setTemp(22);
-        this.log.info("identify: set temperature to 22");
-
         callback();
     },
 
@@ -115,6 +110,10 @@ CooperHunterAC.prototype = {
             host: this.host,
             updateInterval: this.updateInterval,
             onStatus: (deviceModel) => {
+                if (deviceModel.bound === false) {
+                    return ;
+                }
+
                 this.getActive((x, val) => {
                    heaterCoolerService
                         .getCharacteristic(Characteristic.Active)
@@ -161,14 +160,13 @@ CooperHunterAC.prototype = {
                         .getCharacteristic(Characteristic.RotationSpeed)
                         .updateValue(val);
                 });
-
             },
             onUpdate: (deviceModel) => {
                 // this.log.info('Status updated on %s', deviceModel.name)
             },
             onConnected: (deviceModel) => {
                 if (deviceModel.bound == true) {
-                    this.log.info('Connected to %s with IP address', deviceModel.name, deviceModel.address);
+                    this.log.info('Connected to device "%s" with IP address "%s"', deviceModel.name, deviceModel.address);
                 } else {
                     this.log.info('Error connecting to %s with IP address %s', deviceModel.name, deviceModel.address);
                 }
@@ -189,7 +187,11 @@ CooperHunterAC.prototype = {
 
     setActive: function (Active, callback, context) {
         if (this._isContextValid(context)) {
-            this.device.setPower(Active === Characteristic.Active.ACTIVE ? commands.power.value.on : commands.power.value.off);
+            if (this.device.getPower() === Characteristic.Active.INACTIVE && Active === Characteristic.Active.INACTIVE) {
+                // Do nothing, device is turned off
+            } else {
+                this.device.setPower(Active === Characteristic.Active.ACTIVE ? commands.power.value.on : commands.power.value.off);
+            }
         }
         callback();
     },
