@@ -17,8 +17,6 @@ function CooperHunterAC(log, config) {
     this.updateInterval = config.updateInterval || 10000;
     this.tempSensorShift = config.tempSensorShift || 40;
     this.model = config.model || "Cooper&Hunter AC";
-
-    log.log(config);
 }
 
 CooperHunterAC.prototype = {
@@ -166,26 +164,26 @@ CooperHunterAC.prototype = {
 
             },
             onUpdate: (deviceModel) => {
-                // log.info('Status updated on %s', deviceModel.name)
+                // this.log.info('Status updated on %s', deviceModel.name)
             },
             onConnected: (deviceModel) => {
                 if (deviceModel.bound == true) {
-                    log.info('Connected to %s with IP address', deviceModel.name, deviceModel.address);
+                    this.log.info('Connected to %s with IP address', deviceModel.name, deviceModel.address);
                 } else {
-                    log.info('Error connecting to %s with IP address %s', deviceModel.name, deviceModel.address);
+                    this.log.info('Error connecting to %s with IP address %s', deviceModel.name, deviceModel.address);
                 }
 
             },
             onError: (deviceModel) => {
-                log.info('Error communicating with device %s with IP address %s', deviceModel.name, deviceModel.address);
+                this.log.info('Error communicating with device %s with IP address %s', deviceModel.name, deviceModel.address);
 
             },
             onDisconnected: (deviceModel) => {
-                log.info('Disconnected from device %s with IP address %s', deviceModel.name, deviceModel.address);
+                this.log.info('Disconnected from device %s with IP address %s', deviceModel.name, deviceModel.address);
 
             }
         };
-        log.info("Start discover device %s", deviceOptions.host);
+        this.log.info("Start discover device %s", deviceOptions.host);
         this.device = deviceFactory.connect(deviceOptions);
     },
 
