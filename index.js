@@ -80,7 +80,7 @@ CooperHunterAC.prototype = {
                 unit: null,
                 format: Characteristic.Formats.UINT8,
                 maxValue: 6,
-                minValue: 1,
+                minValue: 0,
                 validValues: [1, 2, 3, 4, 5, 6] // 6 - auto
             })
             .on('get', this.getRotationSpeed.bind(this))
