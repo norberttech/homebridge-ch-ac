@@ -312,7 +312,7 @@ CooperHunterAC.prototype = {
     getRotationSpeed: function (callback) {
         let speed = this.device.getFanSpeed();
         if (isNaN(parseFloat(speed))) {
-            speed = commands.fanSpeed.value.auto;
+            speed = 6;
         } else {
             speed = speed === commands.fanSpeed.value.auto ? 6 : speed;
         }
