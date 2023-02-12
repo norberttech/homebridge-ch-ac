@@ -80,7 +80,7 @@ CooperHunterAC.prototype = {
                 unit: null,
                 format: Characteristic.Formats.UINT8,
                 maxValue: 6,
-                minValue: 1,
+                minValue: 0,
                 validValues: [1, 2, 3, 4, 5, 6] // 6 - auto
             })
             .on('get', this.getRotationSpeed.bind(this))
@@ -225,7 +225,13 @@ CooperHunterAC.prototype = {
 
     },
     getCurrentTemperature: function (callback) {
-        callback(null, this.device.getRoomTemp() - this.tempSensorShift);
+        let temp = this.device.getRoomTemp()
+        if (isNaN(parseFloat(temp))) {
+            temp = 0;
+        } else {
+            temp = temp - this.tempSensorShift;
+        }
+        callback(null, temp);
     },
     setTemperatureDisplayUnits: function (value, callback) {
         // F is unsupported
@@ -275,7 +281,11 @@ CooperHunterAC.prototype = {
     },
 
     getTargetTemperature: function (callback) {
-        callback(null, this.device.getTemp());
+        let temp = this.device.getTemp();
+        if (isNaN(parseFloat(temp))) {
+            temp = 22; // Value must be within 16 to 30 range defined above
+        }
+        callback(null, temp);
     },
 
     setTargetTemperature: function (TargetTemperature, callback, context) {
@@ -301,7 +311,11 @@ CooperHunterAC.prototype = {
 
     getRotationSpeed: function (callback) {
         let speed = this.device.getFanSpeed();
-        speed = speed === commands.fanSpeed.value.auto ? 6 : speed;
+        if (isNaN(parseFloat(speed))) {
+            speed = 6;
+        } else {
+            speed = speed === commands.fanSpeed.value.auto ? 6 : speed;
+        }
 
         callback(null, speed);
 

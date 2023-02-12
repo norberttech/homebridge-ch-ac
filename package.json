@@ -1,6 +1,6 @@
 {
   "name": "homebridge-ch-ac",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Cooper&Hunter AC plugin for Homebridge (Homekit).",
   "license": "MIT",
   "keywords": [
@@ -11,7 +11,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/norzechowicz/homebridge-ch-ac.git"
+    "url": "git+https://github.com/anton-iermolenko/homebridge-ch-ac/tree/enable-low-rotation"
   },
   "engines": {
     "homebridge": ">=0.4.32"
