@@ -285,7 +285,7 @@ CooperHunterAC.prototype = {
         if (isNaN(parseFloat(temp))) {
             temp = 22; // Value must be within 16 to 30 range defined above
         }
-        callback(null, this.device.getTemp());
+        callback(null, temp);
     },
 
     setTargetTemperature: function (TargetTemperature, callback, context) {
